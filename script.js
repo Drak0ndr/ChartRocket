@@ -56,7 +56,7 @@ btn.addEventListener('click', function() {
         }
         dataG = []
         for(let i=0; i<lbls.length; i++) {
-            dataG.push(out[lbls[i]]['accel']/9.81)
+            dataG.push(out[lbls[i]]['accel'])
         }
         console.log(pars(res))
         document.body.innerHTML = ''

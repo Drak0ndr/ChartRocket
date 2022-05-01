@@ -3,88 +3,63 @@ const input = document.querySelector('input')
 const ctx = document.createElement('canvas')
 const att = document.querySelector('[name=att]')
 const acc = document.querySelector('[name=acc]')
-function pars(arr) {
-    let result = []
-    let out = {}
-    for(let i =0; i<arr.length; i++) {
-        result.push(arr[i].split('\t'))
-        for(let j = 0; j< result[i].length; j++) {
-            result[i][j]= result[i][j].split(':')
-            for(let q = 0; q<result[i][j].length;q++) {
-                if(result[i][j][q]== +result[i][j][q]) {
-                    result[i][j][q] = +result[i][j][q]
-                }
-            }
-        }
-    }
-    for(let i =0;i<result.length;i++) {
-        if(result[i].length == 12) {
-            out[result[i][1][1]] = {
-                [result[i][0][0]]: result[i][0][1],
-                [result[i][2][0]]: result[i][2][1],
-                [result[i][3][0]]: result[i][3][1],
-                [result[i][4][0]]: result[i][4][1],
-                [result[i][5][0]]: result[i][5][1],
-                [result[i][6][0]]: [result[i][6][1], result[i][7][0], result[i][8][0]],
-                [result[i][9][0]]: result[i][9][1],
-                [result[i][10][0]]: result[i][10][1],
-                [result[i][11][0]]: result[i][11][1]
-            }
-        }
 
-
-    }
-    return(out)
-}
-btn.addEventListener('click', function() {
+btn.addEventListener('click', function () {
     let file = input.files[0]
     let reader = new FileReader()
-    let res =0
+    let res = 0
+    let data = []
+    
     reader.readAsText(file)
-    reader.onload = function() {
+    reader.onload = function () {
         res = reader.result
-        console.log(res)
-        res = res.replaceAll('\t\r', '')
+        res = res.replaceAll('\t', '').replaceAll('\r', '')
         res = res.split('\n')
-        res.pop()
-        console.log(res)
-        let out = pars(res)
-        let lbls = Object.keys(out)
-        dataA = []
-        for(let i =0; i< lbls.length; i++) {
-            dataA.push(out[lbls[i]]['Altitude'])
+        let lbls = []
+        let dataA = []
+        let dataG = []
+        for (let i = 0; i < res.length; i++) {
+            if(res[i].split(';').length == 10) {
+                data.push(res[i].split(';'))
+                lbls.push(+res[i].split(';')[1])
+                dataA.push(+res[i].split(';')[2])
+                dataG.push(+res[i].split(';')[4])
+            }
         }
-        dataG = []
-        for(let i=0; i<lbls.length; i++) {
-            dataG.push(out[lbls[i]]['accel'])
-        }
-        console.log(pars(res))
+        //console.log(data)
+        //console.log(lbls)
+        //console.log(dataA)
+        //console.log(dataG)
+        console.log(Math.max(...dataA))
         document.body.innerHTML = ''
         ctx.height = window.innerHeight
         ctx.width = window.innerWidth
         document.body.appendChild(ctx)
-        if(att.checked && acc.checked) {
+        if (att.checked && acc.checked) {
             let myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: lbls,
                     datasets: [{
-                        label: 'Высота',
-                        data: dataA,
-                        backgroundColor:['rgba(255, 99, 132, 0.2)'],
-                        borderColor: ['rgba(0,0,255,0.8)'],
-                        borderWidth: 2,
-                        cubicInterpolationMode: 'monotone'
-                    },
-                    {
-                        label: 'Ускорение',
-                        data: dataG,
-                        backgroundColor:['rgba(255, 99, 132, 0.2)'],
-                        borderColor: ['rgba(0,255,0,0.8)'],
-                        borderWidth: 2,
-                        cubicInterpolationMode: 'monotone'
-                    }],
-    
+                            label: 'Высота',
+                            data: dataA,
+                            backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgba(0,0,255,0.8)'],
+                            borderWidth: 1,
+                            radius: 2,
+                            cubicInterpolationMode: 'monotone'
+                        },
+                        {
+                            label: 'Ускорение',
+                            data: dataG,
+                            backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgba(0,255,0,0.8)'],
+                            borderWidth: 1,
+                            radius: 2,
+                            cubicInterpolationMode: 'monotone'
+                        }
+                    ],
+
                 },
                 options: {
                     plugins: {
@@ -95,7 +70,7 @@ btn.addEventListener('click', function() {
                     }
                 }
             })
-        } else if(att.checked) {
+        } else if (att.checked) {
             let myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -103,12 +78,13 @@ btn.addEventListener('click', function() {
                     datasets: [{
                         label: 'Высота',
                         data: dataA,
-                        backgroundColor:['rgba(255, 99, 132, 0.2)'],
+                        backgroundColor: ['rgba(255, 99, 132, 0.2)'],
                         borderColor: ['rgba(0,0,255,0.8)'],
-                        borderWidth: 2,
+                        borderWidth: 1,
+                        radius: 2,
                         cubicInterpolationMode: 'monotone'
                     }],
-    
+
                 },
                 options: {
                     plugins: {
@@ -119,21 +95,21 @@ btn.addEventListener('click', function() {
                     }
                 }
             })
-        } else if(acc.checked) {
+        } else if (acc.checked) {
             let myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: lbls,
-                    datasets: [
-                    {
+                    datasets: [{
                         label: 'Ускорение',
                         data: dataG,
-                        backgroundColor:['rgba(255, 99, 132, 0.2)'],
+                        backgroundColor: ['rgba(255, 99, 132, 0.2)'],
                         borderColor: ['rgba(0,255,0,0.8)'],
-                        borderWidth: 2,
+                        borderWidth: 1,
+                        radius: 2,
                         cubicInterpolationMode: 'monotone'
                     }],
-    
+
                 },
                 options: {
                     plugins: {
